@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sport Events</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.1.1/mapbox-gl.css" rel="stylesheet" />
+
+    <style>
+        html { height: 100% }
+        body { height: 100% }
+        #map { margin: 0 auto; height: 70%; width: 80%}
+        .text-center {text-align: center;}
+    </style>
+</head>
+<body>
+<h1 class="text-center">スポーツ大会情報マップ</h1>
+<p class="text-center">下記期間の大会情報をピンとしてマップに表示しています</p>
+<p class="text-center" th:text="'表示期間: ' + ${eventDuration[0]}"></p>
+<div id='map'></div>
+<script th:inline="javascript">
+   const events = /*[[${events}]]*/
+   const ID_NAME = 'point';
+   const ICON_NAME = 'icon';
+   const ICON_URL = 'https://img.icons8.com/material/32/FF0000/marker--v1.png';
+   const INIT_LATITUDE_LONGITUDE = [139.7670516, 35.6811673];//東京駅を初期位置として設定
+   const POPUP_FORMAT = (event) => { return '<strong>' + event.name + '</strong>' + '<p>Date: ' + event.dateAndTime + '<br>Place: ' + event.place + '<br>URL: ' + '<a href="' + event.url + '">' + event.url + '</a>' + '</p>';};
+   const MAPBOX_ACCESSTOKEN = 'pk.eyJ1IjoieGlhb3hpYW9tYW9tYW8iLCJhIjoiY2t4emtkYnJ5MGNuZjJ3bTh3MGZrM29qcyJ9.2BihNIJJnIly4D-zEwBdvw'
+
+   mapboxgl.accessToken = MAPBOX_ACCESSTOKEN;
+   var map = new mapboxgl.Map({
+       container: 'map',
+       style: 'mapbox://styles/mapbox/streets-v11',
+       center: INIT_LATITUDE_LONGITUDE,
+       zoom: 15
+   });
+
+   // Symbol Layer
+   const symbolData = {
+       'type': 'FeatureCollection',
+       'features': []
+   };
+   map.on('load', () => {
+       map.loadImage(
+           ICON_URL,
+           (error, image) => {
+               if (error) {
+                   throw error;
+               }
+               map.addImage(ICON_NAME, image);
+               map.addSource('point', {
+                   'type': 'geojson',
+                   'data': symbolData
+               });
+               map.addLayer({
+                   'id': ID_NAME,
+                   'type': 'symbol',
+                   'source': ID_NAME,
+                   'layout': {
+                       'icon-image': ICON_NAME,
+                       'icon-size': 1,
+                       'icon-allow-overlap': true,
+                       'icon-ignore-placement': true,
+                   }
+               });
+           }
+       );
+
+       map.on('click', ID_NAME, (e) => {
+           const coordinates = e.features[0].geometry.coordinates.slice();
+           const description = e.features[0].properties.description;
+
+           while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+               coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+           }
+
+           new mapboxgl.Popup()
+               .setLngLat(coordinates)
+               .setHTML(description)
+               .addTo(map);
+       });
+
+       map.on('mouseenter', ID_NAME, () => {
+           map.getCanvas().style.cursor = 'pointer';
+       });
+
+       map.on('mouseleave', ID_NAME, () => {
+           map.getCanvas().style.cursor = '';
+       });
+
+       events.forEach(e => {
+           symbolData.features.push({
+               'type': 'Feature',
+               'properties': {
+                   'description':
+                        POPUP_FORMAT(e),
+               },
+               'geometry': {
+                   'type': 'Point',
+                   'coordinates': [e.latitude, e.longitude]
+               }
+           });
+       });
+   });
+</script>
+</body>
+</html>
