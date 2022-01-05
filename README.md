@@ -12,7 +12,7 @@ java側の設定はsrc/main/resources/application.propertiesに書いてある�
 ```
 mvn compile exec:java -Dexec.mainClass=.jp.co.xiaobai.MyApplication
 ```
-http://localhost:3000/にてアクセス可能
+http://localhost:3000/ にてアクセス可能
 
 ## 指定した日のイベント情報を表示
-http://localhost:3000/event/{yyyy-mm-dd}にてアクセスするとyyyy年mm月dd日の大会情報が地図に表示される。
+http://localhost:3000/event/{yyyy-mm-dd} にてアクセスするとyyyy年mm月dd日の大会情報が地図に表示される。
