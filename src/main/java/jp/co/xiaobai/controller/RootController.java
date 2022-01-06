@@ -17,7 +17,7 @@ public class RootController {
 
     @RequestMapping("/")
     public String getToday(Model model) {
-        return "redirect:event/2022-1-1";
+        return "redirect:" + eventPlaceService.getURLForTodayEvent();
     }
 
     @RequestMapping("/event/{eventDate}")

@@ -61,4 +61,9 @@ public class EventPlaceService {
         beginAndEndDay.add(DateUtils.ceiling(date, Calendar.DAY_OF_MONTH));
         return beginAndEndDay;
     }
+
+    public String getURLForTodayEvent() {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-M-d");
+        return "event/" + df.format(new Date());
+    }
 }
