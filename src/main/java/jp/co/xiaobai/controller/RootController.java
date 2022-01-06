@@ -25,6 +25,7 @@ public class RootController {
         // 現状ではeventDateで指定した1日だけの大会情報を取得する
         model.addAttribute("events", eventPlaceService.getEventsFromDate(eventDate));
         model.addAttribute("eventDuration", eventPlaceService.getDuration(eventDate));
+	System.out.println("[Accessed]");
         return "showEvents";
     }
 }
